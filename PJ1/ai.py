@@ -86,11 +86,13 @@ class AI(object):
         op_cnt = len(np.where(chessboard == -self.color)[0])
         
         t = pl_cnt+op_cnt
-        v = self.variable
+        v = np.copy(self.variable); v[0] = v[0]/32/32
         s = op_cnt-pl_cnt
         k = len(candidate_list) if color == self.color else -len(candidate_list)
         c = self.chessboard_size*self.chessboard_size
+        # print(chessboard)
         if t == 64 or (k == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
+            # print(chessboard)
             if s > 0:
                 return inf-1
             elif s < 0:
@@ -103,9 +105,9 @@ class AI(object):
     def maximize(self, color, select_node, chessboard, depth, alpha, beta):
         # print("max", chessboard)
         candidate_list = self.get_candidate_list(color, chessboard)
-        
+        ept_cnt = len(np.where(chessboard == COLOR_NONE)[0])
         # print(candidate_list)
-        if depth >= 4 or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
+        if (ept_cnt > 8 and depth >= 4) or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
             return ((), self.eval(color, select_node, chessboard, candidate_list))
         if len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) != 0:
             return self.minimize(-color, select_node, chessboard, depth, alpha, beta)
@@ -121,15 +123,15 @@ class AI(object):
                 break
             if maxUtility > alpha:
                 alpha = maxUtility
+        # print(chessboard, color, maxNode, maxUtility)
         return (maxNode, maxUtility)
 
     def minimize(self, color, select_node, chessboard, depth, alpha, beta):
         # print("min", chessboard)
         candidate_list = self.get_candidate_list(color, chessboard)
+        ept_cnt = len(np.where(chessboard == COLOR_NONE)[0])
         # print(candidate_list)
-        if depth >= 4 or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
-            # print(depth, color)
-            # print(chessboard)
+        if (ept_cnt > 8 and depth >= 4) or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
             return ((), self.eval(color, select_node, chessboard, candidate_list))
         if len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) != 0:
             return self.maximize(-color, select_node, chessboard, depth, alpha, beta)
