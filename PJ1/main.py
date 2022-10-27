@@ -99,14 +99,28 @@ def transform(env):
             temp[7-i][j] = temp[7-i][7-j] = temp[i][7-j] = temp[i][j] = env[i][j]
     return temp
 
+def rand_array():
+    temp = np.zeros(dim)
+    temp[2] = random.uniform(0, 1)
+    temp[1] = random.uniform(0, temp[2])
+    temp[0] = random.uniform(0, temp[1])
+    return temp
+
 def normal(v):
     temp = np.copy(v)
-    temp[0] = np.fabs(v[0])
-    temp[1] = np.fabs(v[1])
-    temp[2] = np.fabs(v[2])
+    if temp[0] >= 1:
+        temp[0] = 1
+    if temp[0] <= 0:
+        temp[0] = 0
+    if temp[1] >= 1:
+        temp[1] = 1
+    if temp[1] <= 0:
+        temp[1] = 0
+    if temp[2] >= 1:
+        temp[2] = 1
+    if temp[2] <= 0:
+        temp[2] = 0
     temp = np.sort(temp)
-    temp = temp / np.sum(temp)
-    # print(temp)
     return temp
 
 def climb(v, env, pos, weight):
@@ -151,9 +165,9 @@ def test():
 
 def genetic_algorithm(population:list):
     for indiv in population:
-        for _ in range(3):
+        for _ in range(5):
             r_indiv = random.choice(population)
-            r = compete(indiv.variable, r_indiv.variable)
+            r = compete(indiv.variable, r_indiv.variable, True)
             indiv.fitness += r
             r_indiv.fitness -= r
             if r == 2:
@@ -177,8 +191,9 @@ def mutate(population: list):
         return (indiv1.variable+indiv2.variable)/2
     def mut(variable:np.ndarray):
         v = np.copy(variable)
-        for i in range(v.size):
-            v[i] += random.uniform(-0.35, 0.35)
+        v[0] += random.uniform(-0.01, 0.01)
+        v[1] += random.uniform(-0.10, 0.10)
+        v[2] += random.uniform(-0.25, 0.25)
         return v
     descs = []
     num = len(population)
@@ -209,12 +224,12 @@ def main(args):
             descendants = []
             population = []
             for i in range(10):
-                indiv = Individual(count(), normal(np.random.randn(dim)))
+                indiv = Individual(count(), rand_array())
                 population.append(indiv)
             descendants.append(population)
             while len(descendants) <= 5:
                 population = genetic_algorithm(population)
-                while len(population) >= 20:
+                while len(population) > 20:
                     population.pop(0)
                 print('remain %d species' % len(population), file=out)
                 for indiv in population:
