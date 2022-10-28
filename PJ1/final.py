@@ -19,14 +19,14 @@ class AI(object):
         self.candidate_list = []
         self.dirx = [1,-1,0,0,1,1,-1,-1]
         self.diry = [0,0,1,-1,1,-1,1,-1]
-        self.variable = [0.09523882, 0.26912089, 0.77075692]
+        self.variable = [0.35706931, 0.69359312, 0.76539461]
         self.env = [[500,-45,10,5,5,10,-45,500],
-                    [-45,15,1,1,1,1,15,-45],
+                    [-45,5,1,1,1,1,5,-45],
                     [10,1,3,2,2,3,1,10],
                     [5,1,2,1,1,2,1,5],
                     [5,1,2,1,1,2,1,5],
                     [10,1,3,2,2,3,1,10],
-                    [-45,15,1,1,1,1,15,-45],
+                    [-45,5,1,1,1,1,5,-45],
                     [500,-45,10,5,5,10,-45,500]]
     
     def get_candidate_list(self, color, chessboard):
@@ -112,7 +112,7 @@ class AI(object):
         candidate_list = self.get_candidate_list(color, chessboard)
         ept_cnt = len(np.where(chessboard == COLOR_NONE)[0])
         # print(candidate_list)
-        if (ept_cnt > 8 and depth >= 4) or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
+        if (ept_cnt > 10 and depth >= 4) or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
             return ((), self.eval(color, select_node, chessboard, candidate_list))
         if len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) != 0:
             return self.minimize(-color, select_node, chessboard, depth, alpha, beta)
@@ -135,7 +135,7 @@ class AI(object):
         candidate_list = self.get_candidate_list(color, chessboard)
         ept_cnt = len(np.where(chessboard == COLOR_NONE)[0])
         # print(candidate_list)
-        if (ept_cnt > 8 and depth >= 4) or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
+        if (ept_cnt > 10 and depth >= 4) or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
             return ((), self.eval(color, select_node, chessboard, candidate_list))
         if len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) != 0:
             return self.maximize(-color, select_node, chessboard, depth, alpha, beta)
