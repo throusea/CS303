@@ -21,12 +21,12 @@ class AI(object):
         self.diry = [0,0,1,-1,1,-1,1,-1]
         self.variable = [0.35706931, 0.69359312, 0.76539461]
         self.env = [[500,-45,10,5,5,10,-45,500],
-                    [-45,5,1,1,1,1,5,-45],
+                    [-45,-25,1,1,1,1,-25,-45],
                     [10,1,3,2,2,3,1,10],
                     [5,1,2,1,1,2,1,5],
                     [5,1,2,1,1,2,1,5],
                     [10,1,3,2,2,3,1,10],
-                    [-45,5,1,1,1,1,5,-45],
+                    [-45,-25,1,1,1,1,-25,-45],
                     [500,-45,10,5,5,10,-45,500]]
     
     def get_candidate_list(self, color, chessboard):
@@ -98,21 +98,26 @@ class AI(object):
         k = len(candidate_list) if color == self.color else -len(candidate_list)
         c = self.chessboard_size*self.chessboard_size
         if t == 64 or (k == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
-            if s > 0:
-                return inf-1
-            elif s < 0:
-                return -inf+1
-            else:
-                return 0
+            return 100000*s
         else:
-            return (v[0]*t*t-c*v[0]*t+v[1])*s+(-v[0]*t*t+c*v[0]*t+v[2]-v[1])*k+(1-v[2])*(-self.env[node[0]][node[1]])
+            score = (v[0]*t*t-c*v[0]*t+v[1])*s+(-v[0]*t*t+c*v[0]*t+v[2]-v[1])*k+(1-v[2])*(-self.env[node[0]][node[1]]); bonus = 0
+            if t > 25:
+                if chessboard[0][0] == COLOR_NONE and chessboard[0][1] == chessboard[1][0] == chessboard[1][1] and chessboard[0][1] != COLOR_NONE:
+                    bonus += 10 if chessboard[0][1] == self.color else -10
+                if chessboard[0][7] == COLOR_NONE and chessboard[0][6] == chessboard[1][7] == chessboard[1][6] and chessboard[0][6] != COLOR_NONE:
+                    bonus += 10 if chessboard[0][6] == self.color else -10
+                if chessboard[7][0] == COLOR_NONE and chessboard[6][0] == chessboard[7][1] == chessboard[6][1] and chessboard[6][0] != COLOR_NONE:
+                    bonus += 10 if chessboard[6][0] == self.color else -10
+                if chessboard[7][7] == COLOR_NONE and chessboard[7][6] == chessboard[6][7] == chessboard[6][6] and chessboard[7][6] != COLOR_NONE:
+                    bonus += 10 if chessboard[7][6] == self.color else -10
+            return score+bonus
     
     def maximize(self, color, select_node, chessboard, depth, alpha, beta):
         # print("max", chessboard)
         candidate_list = self.get_candidate_list(color, chessboard)
         ept_cnt = len(np.where(chessboard == COLOR_NONE)[0])
         # print(candidate_list)
-        if (ept_cnt > 10 and depth >= 4) or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
+        if (ept_cnt > 8 and depth >= 5) or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
             return ((), self.eval(color, select_node, chessboard, candidate_list))
         if len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) != 0:
             return self.minimize(-color, select_node, chessboard, depth, alpha, beta)
@@ -135,7 +140,7 @@ class AI(object):
         candidate_list = self.get_candidate_list(color, chessboard)
         ept_cnt = len(np.where(chessboard == COLOR_NONE)[0])
         # print(candidate_list)
-        if (ept_cnt > 10 and depth >= 4) or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
+        if (ept_cnt > 8 and depth >= 5) or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
             return ((), self.eval(color, select_node, chessboard, candidate_list))
         if len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) != 0:
             return self.maximize(-color, select_node, chessboard, depth, alpha, beta)

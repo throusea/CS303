@@ -1,3 +1,4 @@
+from turtle import screensize
 import numpy as np
 import random
 import time
@@ -91,7 +92,7 @@ class AI(object):
         k = len(candidate_list) if color == self.color else -len(candidate_list)
         c = self.chessboard_size*self.chessboard_size
         # print(chessboard)
-        print(k)
+        # print(k)
         if t == 64 or (k == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
             if s > 0:
                 return inf-1
@@ -100,12 +101,22 @@ class AI(object):
             else:
                 return 0
         else:
-            env_score = 0
-            # print('slt', slted_nodes)
+            env_score = 0; bonus = 0
             for (o, clr) in slted_nodes:
                 env_score = env_score + (-self.env[o[0]][o[1]] if clr == self.color else self.env[o[0]][o[1]])
             # print('envscore', env_score)
-            score = (v[0]*t*t-c*v[0]*t+v[1])*s+(-v[0]*t*t+c*v[0]*t+v[2]-v[1])*k+(1-v[2])*env_score
+            if t > 30:
+                if chessboard[0][0] == COLOR_NONE and chessboard[0][1] == chessboard[1][0] == chessboard[1][1] and chessboard[0][1] != COLOR_NONE:
+                    bonus += 20 if chessboard[0][1] == self.color else -20
+                if chessboard[0][7] == COLOR_NONE and chessboard[0][6] == chessboard[1][7] == chessboard[1][6] and chessboard[0][6] != COLOR_NONE:
+                    bonus += 20 if chessboard[0][6] == self.color else -20
+                if chessboard[7][0] == COLOR_NONE and chessboard[6][0] == chessboard[7][1] == chessboard[6][1] and chessboard[6][0] != COLOR_NONE:
+                    bonus += 20 if chessboard[6][0] == self.color else -20
+                if chessboard[7][7] == COLOR_NONE and chessboard[7][6] == chessboard[6][7] == chessboard[7][7] and chessboard[7][6] != COLOR_NONE:
+                    bonus += 20 if chessboard[7][6] == self.color else -20
+                
+            score = (v[0]*t*t-c*v[0]*t+v[1])*s+(-v[0]*t*t+c*v[0]*t+v[2]-v[1])*k+(1-v[2])*env_score+bonus
+            print('slt', slted_nodes, k, score)
             # for st_node in stable_list_row:
             #     if st_node[0] == node[0] and chessboard[st_node] == -self.color:
             #         score -= 20
@@ -119,7 +130,7 @@ class AI(object):
         candidate_list = self.get_candidate_list(color, chessboard)
         ept_cnt = len(np.where(chessboard == COLOR_NONE)[0])
         # print(candidate_list)
-        if (ept_cnt > 8 and depth >= 5) or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
+        if (ept_cnt > 10 and depth >= 5) or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
             return ((), self.eval(color, slted_nodes, chessboard, opcand_list))
         if len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) != 0:
             return self.minimize(-color, slted_nodes, opcand_list, chessboard, depth, alpha, beta)
@@ -128,6 +139,8 @@ class AI(object):
             slted_nodes.append((node, color))
             _, utility = self.minimize(-color, slted_nodes, opcand_list, self.play(color, node, chessboard), depth+1, alpha, beta)
             slted_nodes.pop(-1)
+            if depth == 1:
+                print(chessboard, node, utility)
             if utility > maxUtility:
                 maxNode, maxUtility = node, utility
             if maxUtility >= beta:
@@ -141,7 +154,7 @@ class AI(object):
         # print("min", chessboard)
         candidate_list = self.get_candidate_list(color, chessboard)
         ept_cnt = len(np.where(chessboard == COLOR_NONE)[0])
-        if (ept_cnt > 8 and depth >= 5) or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
+        if (ept_cnt > 10 and depth >= 5) or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
             return ((), self.eval(color, slted_nodes, chessboard, opcand_list))
         if len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) != 0:
             return self.maximize(-color, slted_nodes, opcand_list, chessboard, depth, alpha, beta)

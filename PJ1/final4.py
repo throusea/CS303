@@ -6,8 +6,8 @@ COLOR_WHITE=1
 COLOR_NONE=0
 inf = 998244353
 random.seed(0)
-stable_list_row = [(0, 1), (0, 6), (7, 1), (7, 6)]
-stable_list_col = [(1, 0), (6, 0), (6, 7), (1, 7)]
+# stable_list_row = [(0, 1), (0, 6), (7, 1), (7, 6)]
+# stable_list_col = [(1, 0), (6, 0), (6, 7), (1, 7)]
 #don't change the class name
 class AI(object):
     #chessboard_size, color, time_out passed from agent
@@ -22,14 +22,14 @@ class AI(object):
         self.dirx = [1,-1,0,0,1,1,-1,-1]
         self.diry = [0,0,1,-1,1,-1,1,-1]
         self.variable = [0.15960588, 0.73627824, 0.75808343]
-        self.env = [[500,-45,10,5,5,10,-45,500],
+        self.env = [[500,-45,20,10,10,20,-45,500],
                     [-45,-25,1,1,1,1,-25,-45],
-                    [10,1,3,2,2,3,1,10],
-                    [5,1,2,1,1,2,1,5],
-                    [5,1,2,1,1,2,1,5],
-                    [10,1,3,2,2,3,1,10],
+                    [20,1,3,2,2,3,1,20],
+                    [10,1,2,1,1,2,1,10],
+                    [10,1,2,1,1,2,1,10],
+                    [20,1,3,2,2,3,1,20],
                     [-45,-25,1,1,1,1,-25,-45],
-                    [500,-45,10,5,5,10,-45,500]]
+                    [500,-45,20,10,10,20,-45,500]]
     
     def get_candidate_list(self, color, chessboard):
         candidate_list = []
@@ -98,20 +98,25 @@ class AI(object):
         k = len(candidate_list) if color == self.color else -len(candidate_list)
         c = self.chessboard_size*self.chessboard_size
         # print(chessboard)
-        if t == 64 or (k == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
-            if s > 0:
-                return inf-1
-            elif s < 0:
-                return -inf+1
-            else:
-                return 0
+        # print(k)
+        if t == 64 or (len(self.get_candidate_list(color, chessboard)) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
+            return 100000*s
         else:
-            env_score = 0
-            # print('slt', slted_nodes)
+            env_score = 0; bonus = 0
             for (o, clr) in slted_nodes:
                 env_score = env_score + (-self.env[o[0]][o[1]] if clr == self.color else self.env[o[0]][o[1]])
             # print('envscore', env_score)
-            score = (v[0]*t*t-c*v[0]*t+v[1])*s+(-v[0]*t*t+c*v[0]*t+v[2]-v[1])*k+(1-v[2])*env_score
+            if t > 30:
+                if chessboard[0][0] == COLOR_NONE and chessboard[0][1] == chessboard[1][0] == chessboard[1][1] and chessboard[0][1] != COLOR_NONE:
+                    bonus += 10 if chessboard[0][1] == self.color else -10
+                if chessboard[0][7] == COLOR_NONE and chessboard[0][6] == chessboard[1][7] == chessboard[1][6] and chessboard[0][6] != COLOR_NONE:
+                    bonus += 10 if chessboard[0][6] == self.color else -10
+                if chessboard[7][0] == COLOR_NONE and chessboard[6][0] == chessboard[7][1] == chessboard[6][1] and chessboard[6][0] != COLOR_NONE:
+                    bonus += 10 if chessboard[6][0] == self.color else -10
+                if chessboard[7][7] == COLOR_NONE and chessboard[7][6] == chessboard[6][7] == chessboard[6][6] and chessboard[7][6] != COLOR_NONE:
+                    bonus += 10 if chessboard[7][6] == self.color else -10
+            score = (v[0]*t*t-c*v[0]*t+v[1])*s+(-v[0]*t*t+c*v[0]*t+v[2]-v[1])*k+(1-v[2])*env_score+bonus
+            # print('slt', slted_nodes, k, score)
             # for st_node in stable_list_row:
             #     if st_node[0] == node[0] and chessboard[st_node] == -self.color:
             #         score -= 20
@@ -125,7 +130,7 @@ class AI(object):
         candidate_list = self.get_candidate_list(color, chessboard)
         ept_cnt = len(np.where(chessboard == COLOR_NONE)[0])
         # print(candidate_list)
-        if (ept_cnt > 8 and depth >= 5) or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
+        if (ept_cnt > 8 and depth >= 4) or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
             return ((), self.eval(color, slted_nodes, chessboard, opcand_list))
         if len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) != 0:
             return self.minimize(-color, slted_nodes, opcand_list, chessboard, depth, alpha, beta)
@@ -147,7 +152,7 @@ class AI(object):
         # print("min", chessboard)
         candidate_list = self.get_candidate_list(color, chessboard)
         ept_cnt = len(np.where(chessboard == COLOR_NONE)[0])
-        if (ept_cnt > 8 and depth >= 5) or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
+        if (ept_cnt > 8 and depth >= 4) or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
             return ((), self.eval(color, slted_nodes, chessboard, opcand_list))
         if len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) != 0:
             return self.maximize(-color, slted_nodes, opcand_list, chessboard, depth, alpha, beta)
