@@ -1,8 +1,10 @@
+import imp
 from numpy.random import rand, uniform
 from ai import COLOR_BLACK, COLOR_WHITE
 
 import final
 import final2
+import final4
 import ai
 import numpy as np
 import random
@@ -287,6 +289,9 @@ def main(args):
                 if i != 7:
                     print(",")
             print("]")
+    elif args.type == 'battle':
+        r = compete(variable1=[0.16564667, 0.54592091, 0.68846332], type1=ai, type2=final4)
+        print(r)
 
 if __name__ == "__main__":
     argparser = argparse.ArgumentParser(
