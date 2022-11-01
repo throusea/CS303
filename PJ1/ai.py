@@ -139,8 +139,6 @@ class AI(object):
             slted_nodes.append((node, color))
             _, utility = self.minimize(-color, slted_nodes, opcand_list, self.play(color, node, chessboard), depth+1, alpha, beta)
             slted_nodes.pop(-1)
-            if depth == 1:
-                print(chessboard, node, utility)
             if utility > maxUtility:
                 maxNode, maxUtility = node, utility
             if maxUtility >= beta:
