@@ -40,7 +40,10 @@ def count():
 def compete(variable1, type1=ai, variable2=None, type2=ai, is_random=False):
     player = type1.AI(8, COLOR_BLACK, 1, variable1, global_env)
     if is_random == False:
-        opponent = type2.AI(8, COLOR_WHITE, 1, variable2, global_env)
+        if type2 == ai:
+            opponent = type2.AI(8, COLOR_WHITE, 1, variable2, global_env)
+        else:
+            opponent = type2.AI(8, COLOR_WHITE, 1)
     else:
         opponent = ai.RandomAI(8, COLOR_WHITE, 1, variable2, global_env)
     if is_random == True:

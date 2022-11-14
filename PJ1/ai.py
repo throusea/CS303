@@ -116,7 +116,7 @@ class AI(object):
                     bonus += 20 if chessboard[7][6] == self.color else -20
                 
             score = (v[0]*t*t-c*v[0]*t+v[1])*s+(-v[0]*t*t+c*v[0]*t+v[2]-v[1])*k+(1-v[2])*env_score+bonus
-            print('slt', slted_nodes, k, score)
+            # print('slt', slted_nodes, k, score)
             # for st_node in stable_list_row:
             #     if st_node[0] == node[0] and chessboard[st_node] == -self.color:
             #         score -= 20
@@ -139,8 +139,8 @@ class AI(object):
             slted_nodes.append((node, color))
             _, utility = self.minimize(-color, slted_nodes, opcand_list, self.play(color, node, chessboard), depth+1, alpha, beta)
             slted_nodes.pop(-1)
-            if depth == 1:
-                print(chessboard, node, utility)
+            # if depth == 1:
+                # print(chessboard, node, utility)
             if utility > maxUtility:
                 maxNode, maxUtility = node, utility
             if maxUtility >= beta:
