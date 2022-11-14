@@ -1,4 +1,3 @@
-import imp
 from numpy.random import rand, uniform
 from ai import COLOR_BLACK, COLOR_WHITE
 
@@ -37,8 +36,11 @@ def count():
     id = id+1
     return id
 
-def compete(variable1, type1=ai, variable2=None, type2=ai, is_random=False):
-    player = type1.AI(8, COLOR_BLACK, 1, variable1, global_env)
+def compete(variable1=None, type1=ai, variable2=None, type2=ai, is_random=False):
+    if type1 == ai: 
+        player = type1.AI(8, COLOR_BLACK, 1, variable1, global_env)
+    else:
+        player = type1.AI(8, COLOR_BLACK, 1)
     if is_random == False:
         if type2 == ai:
             opponent = type2.AI(8, COLOR_WHITE, 1, variable2, global_env)
@@ -65,10 +67,12 @@ def battle(player, opponent, color):
     chessboard[3][4] = chessboard[4][3] = COLOR_WHITE
     result = DRAW
     cnt = 0
+    time_list = []
     while True:
         is_playing = False
         if color == player.color:
             list = player.go(chessboard)
+            time_list.append(player.time_out)
             if len(list) > 0:
                 chessboard = player.play(player.color, list[-1], chessboard)
                 is_playing = True
@@ -78,8 +82,8 @@ def battle(player, opponent, color):
                 chessboard = opponent.play(opponent.color, list[-1], chessboard)
                 is_playing = True
         color = -color
-        print(chessboard)
-        print(list)
+        # print(chessboard)
+        # print(list)
         if is_playing == False:
             cnt += 1
         else:
@@ -95,6 +99,11 @@ def battle(player, opponent, color):
             else:
                 result = DRAW
             break
+    sum = 0
+    for t in time_list:
+       sum += t
+    sum = sum / len(time_list)
+    print('sum=', sum) 
     return result
 
 def transform(env):
@@ -160,6 +169,9 @@ def test():
     print(candidate_list)
     # print(player.eval(player.color, candidate_list[-1], chessboard, candidate_list))
     print(player.eval(player.color, [((0, 2), 1), ((7, 7), -1), ((0, 7), 1), ((6, 6), -1)], chessboard, candidate_list))
+
+def time_test():
+    compete(type1=final4, type2=final4)
 
 def genetic_algorithm(population:list):
     for indiv in population:
@@ -247,7 +259,7 @@ def main(args):
                     print(indiv.id, indiv.fitness, indiv.variable, file=out)
                 descendants.append(population)
     elif args.type == 'test':
-        test()
+        time_test()
     elif args.type == 'climb':
         dict = {}
         # maxv = normal(np.random.randn(dim))

@@ -130,7 +130,7 @@ class AI(object):
         candidate_list = self.get_candidate_list(color, chessboard)
         ept_cnt = len(np.where(chessboard == COLOR_NONE)[0])
         # print(candidate_list)
-        if (ept_cnt > 8 and depth >= 4) or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
+        if (ept_cnt > 8 and depth >= 3) or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
             return ((), self.eval(color, slted_nodes, chessboard, opcand_list))
         if len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) != 0:
             return self.minimize(-color, slted_nodes, opcand_list, chessboard, depth, alpha, beta)
@@ -152,7 +152,7 @@ class AI(object):
         # print("min", chessboard)
         candidate_list = self.get_candidate_list(color, chessboard)
         ept_cnt = len(np.where(chessboard == COLOR_NONE)[0])
-        if (ept_cnt > 8 and depth >= 4) or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
+        if (ept_cnt > 8 and depth >= 3) or (len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) == 0):
             return ((), self.eval(color, slted_nodes, chessboard, opcand_list))
         if len(candidate_list) == 0 and len(self.get_candidate_list(-color, chessboard)) != 0:
             return self.maximize(-color, slted_nodes, opcand_list, chessboard, depth, alpha, beta)
@@ -174,11 +174,17 @@ class AI(object):
 
     # The input is the current chessboard. Chessboard is a numpy array.
     def go(self, chessboard):
+        start=time.perf_counter()
         self.candidate_list.clear()
         self.candidate_list = self.get_candidate_list(self.color, chessboard)
         if len(self.candidate_list) > 0:
             node, _ = self.maximize(self.color, [], [], chessboard, 1, -inf, inf)
             self.candidate_list.append(node)
+        end=time.perf_counter()
+        # print(start)
+        # print(end)
+        # print(end-start)
+        self.time_out = end-start
         return self.candidate_list
 
 class RandomAI(AI):
